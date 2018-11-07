@@ -102,6 +102,21 @@ class UserController extends FOSRestController
      */
     public function putUserAction(Request $request)
     {
+       return $this->updateUser($request,true);
+    }
+
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/users/{id}")
+     */
+    public function patchUserAction(Request $request)
+    {
+        return $this->updateUser($request,false);
+    }
+
+    public function updateUser(Request $request,$clearMissing){
+
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('AppBundle:User')->find($request->get('id'));
 
@@ -127,7 +142,6 @@ class UserController extends FOSRestController
         ];
 
         return $user;
-
     }
 
 }

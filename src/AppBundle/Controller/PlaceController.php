@@ -112,9 +112,24 @@ class PlaceController extends FOSRestController
      */
     public function putPlaceAction(Request $request)
     { 
+         return $this->updatePlace($request,true);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/places/{id}")
+     */
+    public function patchPlaceAction(Request $request)
+    {
+        return $this->updatePlace($request,false);
+    }
+
+
+    private function updatePlace(Request $request, $clearMissing)
+    {
+
         $em = $this->getDoctrine()->getManager();
 
-      
         $place =  $em->getRepository('AppBundle:Place')->find($request->get('id'));
 
         if ($place === null) {
@@ -139,7 +154,6 @@ class PlaceController extends FOSRestController
         ];
 
         return $place;
-        
     }
 
 }
