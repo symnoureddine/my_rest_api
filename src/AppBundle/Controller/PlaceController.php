@@ -14,7 +14,7 @@ use FOS\RestBundle\View\RouteRedirectView;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use AppBundle\Form\PlaceType;
-
+use FOS\RestBundle\View\View;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use AppBundle\Entity\Place;
@@ -86,6 +86,60 @@ class PlaceController extends FOSRestController
 
         return $this->routeRedirectView('get_place', $routeOptions, Response::HTTP_CREATED);
 
+    }
+
+     /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/places/{id}")
+     */
+    public function removePlaceAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $place = $em->getRepository('AppBundle:Place')
+                    ->find($request->get('id'));
+        /* @var $place Place */
+        if($place){
+            $em->remove($place);
+            $em->flush();
+        }
+        return new View(null, Response::HTTP_NO_CONTENT);
+    }
+
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/places/{id}")
+     */
+    public function putPlaceAction(Request $request)
+    { 
+        $em = $this->getDoctrine()->getManager();
+
+      
+        $place =  $em->getRepository('AppBundle:Place')->find($request->get('id'));
+
+        if ($place === null) {
+            return new View(null, Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm(PlaceType::class, $place, [
+            'csrf_protection' => false,
+        ]);
+
+        $form->submit($request->request->all());
+
+        if (!$form->isValid()) {
+            return $form;
+        }
+
+        $em->flush();
+
+        $routeOptions = [
+            'id' => $place->getId(),
+            '_format' => $request->get('_format'),
+        ];
+
+        return $place;
+        
     }
 
 }

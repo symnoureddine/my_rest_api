@@ -15,7 +15,7 @@ use AppBundle\Form\UserType;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
-
+use FOS\RestBundle\View\View;
 
 use AppBundle\Entity\Place;
 
@@ -78,6 +78,56 @@ class UserController extends FOSRestController
         ];
 
         return $this->routeRedirectView('get_user', $routeOptions, Response::HTTP_CREATED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Delete("/users/{id}")
+     */
+    public function removeUsersAction(Request $request){
+        $em =  $this->getDoctrine()->getManager();
+        $user = $em->getRepository('AppBundle:User')->find($request->get('id'));
+
+        if($user){
+            $em->remove($user);
+            $em->flush();
+        }
+
+        return new View(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/users/{id}")
+     */
+    public function putUserAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository('AppBundle:User')->find($request->get('id'));
+
+        if ($user === null) {
+            return new View(null, Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm(UserType::class,$user, [
+            'csrf_protection' => false,
+        ]);
+
+        $form->submit($request->request->all());
+
+        if (!$form->isValid()) {
+            return $form;
+        }
+
+        $em->flush();
+
+        $routeOptions = [
+            'id' => $user->getId(),
+            '_format' => $request->get('_format'),
+        ];
+
+        return $user;
+
     }
 
 }
