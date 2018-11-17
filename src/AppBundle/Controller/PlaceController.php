@@ -8,16 +8,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 use FOS\RestBundle\View\RouteRedirectView;
-
 use FOS\RestBundle\Controller\FOSRestController;
-
 use AppBundle\Form\PlaceType;
 use FOS\RestBundle\View\View;
-
 use FOS\RestBundle\Controller\Annotations as Rest;
 use AppBundle\Entity\Place;
+
+
 
 class PlaceController extends FOSRestController
 {
@@ -30,7 +28,6 @@ class PlaceController extends FOSRestController
      * @Rest\View
      */
  public function getPlacesAction(Request $request){
-
  	    $places =  $this->getDoctrine()->getRepository('AppBundle:Place')->findAll();
       return $places;
  }
@@ -49,7 +46,8 @@ class PlaceController extends FOSRestController
  	$place = $this->getDoctrine()->getRepository('AppBundle:Place')->find($request->get('id'));
 
  	 if (empty($place)) {
-            return new JsonResponse(['message' => 'Place not found'], Response::HTTP_NOT_FOUND);
+            
+            return new View('Place not found', Response::HTTP_NOT_FOUND);
         }
 
         return $place;
@@ -68,6 +66,7 @@ class PlaceController extends FOSRestController
         ]);
 
         $form->submit($request->request->all());
+        
         
         if (!$form->isValid()) {
             return $form;
@@ -117,7 +116,7 @@ class PlaceController extends FOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/places/{id}")
+     * @Rest\Patch("/{id}")
      */
     public function patchPlaceAction(Request $request)
     {

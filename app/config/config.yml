@@ -20,6 +20,7 @@ framework:
     validation: { enable_annotations: true }
     #serializer: { enable_annotations: true }
     serializer: { enabled: true }
+    templating: { engines: 'twig'}
     default_locale: '%locale%'
     trusted_hosts: ~
     session:
@@ -71,6 +72,14 @@ sensio_framework_extra:
    router:
         annotations: false
 
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: AppBundle\Entity\User
+    from_email:
+        address: "%mailer_user%"
+        sender_name: "%mailer_user%"
+
 fos_rest:
     view:
         formats: { json: true, xml: false, rss: false }
@@ -84,4 +93,13 @@ fos_rest:
         enabled: true
     format_listener:
         rules:
-            - { path: '^/', priorities: ['json'], fallback_format: 'json' }
+            - { path: '^/api', priorities: ['json'], fallback_format: json, prefer_extension: false }
+            - { path: '^/', priorities: [ 'html'], fallback_format: html }
+
+
+
+lexik_jwt_authentication:
+    private_key_path:   %private_key_path%
+    public_key_path:    %public_key_path%
+    pass_phrase:        %pass_phrase%
+    token_ttl:          %token_ttl%
